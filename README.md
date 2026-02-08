@@ -112,6 +112,4 @@ ABIDA is implemented as a **LangGraph** workflow with:
 - **Privacy** → local processing, redaction, access control for exports
 
 ---
-**Repo Checklist**
-- `PRD.md` (this file)
-- `Architecture_Diagram.png` (diagram of LangGraph system)
+
