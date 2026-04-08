@@ -1,0 +1,10 @@
+python-dotenv
+langgraph
+langchain-core
+pydantic
+chromadb
+sentence-transformers
+langchain-groq
+ragas
+datasets
+pandas

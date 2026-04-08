@@ -1,0 +1,18 @@
+[
+  {
+    "question": "What is the primary goal of ABIDA in supply chain operations?",
+    "ground_truth": "The primary goal of ABIDA is to continuously turn raw operational data into decision-ready insights and actions by detecting delays, stock-out risks, and cost spikes, explaining root causes, and executing follow-up tasks."
+  },
+  {
+    "question": "How does ABIDA handle high shipping delays in specific regions?",
+    "ground_truth": "ABIDA detects high shipping delays through KPI analysis, searches SOPs or fulfillment optimizations via RAG (grounding_search), and synthesizes these findings into reports with actionable recommendations."
+  },
+  {
+    "question": "What is the threshold for flagging shipping delays as high in the analysis tool?",
+    "ground_truth": "In the analyze_kpis tool, shipping delays are flagged as high if the average shipping delay is 5 days or more."
+  },
+  {
+    "question": "What should be done if the profit margin is below 5%?",
+    "ground_truth": "If the profit margin is 5% or lower, the analyze_kpis tool flags it as a low profit margin. The agent should then investigate root causes and suggest optimizations such as reducing shipping costs or reviewing vendor SLAs."
+  }
+]
