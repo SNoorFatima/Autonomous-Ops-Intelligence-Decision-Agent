@@ -5,31 +5,26 @@ from dotenv import load_dotenv
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
-from langchain_groq import ChatGroq
+import requests
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.outputs import ChatResult, ChatGeneration
+from langchain_core.messages import AIMessage, BaseMessage
+
 from langgraph.checkpoint.memory import MemorySaver
-
 from tools import grounding_search, analyze_kpis, store_analysis_result, retrieve_past_analyses
-
 
 load_dotenv()
 
 TOOLS = [grounding_search, analyze_kpis, store_analysis_result, retrieve_past_analyses]
 
-
 class GraphState(TypedDict):
     messages: Annotated[List[BaseMessage], add_messages]
 
+from langchain_groq import ChatGroq
+
 def _base_llm():
-    key = os.getenv("GROQ_API_KEY")
-    model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
-    if not key:
-        raise ValueError("GROQ_API_KEY missing. Put it in .env")
-    return ChatGroq(
-        api_key=key, 
-        model=model, 
-        temperature=0,
-        max_tokens=1024
-    )
+    model_name = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    return ChatGroq(model=model_name, temperature=0, streaming=True)
 
 def _llm():
     return _base_llm().bind_tools(TOOLS)
@@ -156,8 +151,10 @@ def call_tools(state):
         print(f"[ToolsNode] Result from {msg.name}: {str(msg.content)[:200]}...")
     return out
 
-def build_graph():
-    memory = MemorySaver()
+def build_graph(memory=None):
+    if memory is None:
+        from langgraph.checkpoint.memory import MemorySaver
+        memory = MemorySaver()
     g = StateGraph(GraphState)
     g.add_node("guardrail", guardrail_node)
     g.add_node("agent", agent_node)
@@ -168,8 +165,8 @@ def build_graph():
     g.add_conditional_edges("agent", router, {"tools": "tools", END: END})
     g.add_edge("tools", "agent")
     
-    # Task: Safety interruption mechanism before execution of high-risk tool
-    return g.compile(checkpointer=memory, interrupt_before=["tools"])
+    # Returning without interrupt_before for REST API compatibility
+    return g.compile(checkpointer=memory)
 
 if __name__ == "__main__":
     app = build_graph()

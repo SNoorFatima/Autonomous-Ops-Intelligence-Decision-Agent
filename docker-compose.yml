@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  agent-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Pass GROQ_API_KEY from host environment
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      # Tell the agent to connect to the ChromaDB service instead of local file
+      - CHROMA_HOST=chroma-db
+    depends_on:
+      - chroma-db
+
+  chroma-db:
+    image: chromadb/chroma:latest
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ALLOW_RESET=TRUE
+    volumes:
+      - chroma-data:/chroma/chroma
+
+volumes:
+  chroma-data:

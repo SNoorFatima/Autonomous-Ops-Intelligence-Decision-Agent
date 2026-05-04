@@ -10,10 +10,8 @@ DB_FOLDER = "rag_db"
 print("Loading embedding model...")
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-client = chromadb.PersistentClient(
-    path=DB_FOLDER,
-    settings=Settings(anonymized_telemetry=False)
-)
+from tools import _get_client
+client = _get_client()
 
 collection = client.get_or_create_collection("abida_knowledge")
 

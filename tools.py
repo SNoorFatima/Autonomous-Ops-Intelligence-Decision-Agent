@@ -32,15 +32,29 @@ _client = None
 def _get_client():
     global _client
     if _client is None:
-        _client = chromadb.PersistentClient(
-            path=DB_DIR,
-            settings=Settings(
-                anonymized_telemetry=False,
-                is_persistent=True
-            ),
-            tenant="default_tenant",
-            database="default_database"
-        )
+        chroma_host = os.environ.get("CHROMA_HOST")
+        if chroma_host:
+            print(f"[Chroma] Connecting to remote ChromaDB at {chroma_host}:8000")
+            _client = chromadb.HttpClient(
+                host=chroma_host,
+                port=8000,
+                settings=Settings(
+                    anonymized_telemetry=False
+                ),
+                tenant="default_tenant",
+                database="default_database"
+            )
+        else:
+            print(f"[Chroma] Using local PersistentClient at {DB_DIR}")
+            _client = chromadb.PersistentClient(
+                path=DB_DIR,
+                settings=Settings(
+                    anonymized_telemetry=False,
+                    is_persistent=True
+                ),
+                tenant="default_tenant",
+                database="default_database"
+            )
     return _client
 
 
