@@ -158,6 +158,10 @@ def run_ci_evaluation():
                 all_passed = False
 
         results_output.append(case_results)
+        
+        import time
+        print("  Waiting 15s to prevent API Rate Limits...")
+        time.sleep(15)
 
     # Write machine-readable output
     with open("eval_results.json", "w") as f:
