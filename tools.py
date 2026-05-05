@@ -92,10 +92,11 @@ def grounding_search(query: str, top_k: int = 2) -> List[Dict[str, Any]]:
 
     hits = []
     for doc, meta, dist in zip(res["documents"][0], res["metadatas"][0], res["distances"][0]):
+        truncated_doc = doc[:1000] + "..." if len(doc) > 1000 else doc
         hits.append({
             "source": meta.get("source", "unknown"),
             "chunk": meta.get("chunk", None),
-            "text": doc,
+            "text": truncated_doc,
             "score": float(1 - dist)
         })
     print(f"[Tool: RAG] Found {len(hits)} relevant chunks.")

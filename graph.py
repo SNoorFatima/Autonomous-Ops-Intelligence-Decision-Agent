@@ -97,10 +97,16 @@ def agent_node(state: GraphState):
     
     # Prune history if it gets too long to avoid token exhaustion
     messages = state["messages"]
-    if len(messages) > 12:
+    if len(messages) > 10:
         print(f"[Agent] Pruning history (current: {len(messages)} messages)")
         system_msg = [m for m in messages if isinstance(m, SystemMessage)]
-        recent_msgs = messages[-8:]
+        recent_msgs = messages[-6:]
+        
+        # Prevent API crashes by ensuring we don't start with an orphaned ToolMessage
+        from langchain_core.messages import ToolMessage
+        while recent_msgs and isinstance(recent_msgs[0], ToolMessage):
+            recent_msgs = recent_msgs[1:]
+            
         messages = system_msg + recent_msgs
 
     # Improved loop detection using a set of call signatures
