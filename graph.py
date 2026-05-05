@@ -116,6 +116,12 @@ def agent_node(state: GraphState):
     msg = llm.invoke(messages)
     
     if hasattr(msg, "tool_calls") and msg.tool_calls:
+        # Hard limit to prevent infinite semantic loops
+        tool_call_count = sum(1 for m in history if hasattr(m, "tool_calls") and m.tool_calls)
+        if tool_call_count >= 3:
+            print("[Agent] HARD LOOP LIMIT REACHED (3 calls). Forcing response.")
+            return {"messages": [AIMessage(content="I have gathered enough information from the documents and cannot find any further specific details. Based on the results above, here is my final assessment.")]}
+
         for tc in msg.tool_calls:
             import json
             args_str = json.dumps(tc['args'], sort_keys=True)
